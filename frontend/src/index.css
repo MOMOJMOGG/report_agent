@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  code, pre {
+    font-family: 'JetBrains Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+  }
+}
+
+@layer components {
+  .glass-effect {
+    @apply backdrop-blur-xl bg-white/10 border border-white/20;
+  }
+  
+  .tech-border {
+    @apply border border-primary-500/30 bg-gradient-to-r from-primary-500/10 to-secondary-500/10;
+  }
+  
+  .nav-item {
+    @apply flex items-center space-x-3 px-3 py-2 rounded-lg text-dark-600 hover:text-primary-400 hover:bg-primary-500/10 transition-all duration-200 group;
+  }
+  
+  .nav-item.active {
+    @apply text-primary-400 bg-primary-500/20 shadow-lg shadow-primary-500/25;
+  }
+  
+  .card-tech {
+    @apply bg-dark-100/50 backdrop-blur-xl border border-dark-200/30 rounded-xl p-6 hover:border-primary-500/30 transition-all duration-300;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 shadow-lg shadow-primary-600/25 hover:shadow-primary-700/25;
+  }
+  
+  .btn-secondary {
+    @apply bg-dark-200/30 hover:bg-dark-200/50 text-dark-700 border border-dark-300/30 px-4 py-2 rounded-lg font-medium transition-all duration-200;
+  }
+  
+  .status-indicator {
+    @apply w-2 h-2 rounded-full animate-pulse-tech;
+  }
+  
+  .status-running {
+    @apply bg-primary-500;
+  }
+  
+  .status-completed {
+    @apply bg-success-500;
+  }
+  
+  .status-failed {
+    @apply bg-accent-500;
+  }
+  
+  .status-pending {
+    @apply bg-warning-500;
+  }
+  
+  .progress-bar {
+    @apply w-full bg-dark-200/30 rounded-full h-2 overflow-hidden;
+  }
+  
+  .progress-fill {
+    @apply h-full bg-gradient-to-r from-primary-500 to-primary-400 transition-all duration-500 ease-out;
+  }
+}
