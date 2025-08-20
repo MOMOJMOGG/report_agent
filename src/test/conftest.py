@@ -11,11 +11,24 @@ from typing import Generator, Dict, Any
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.main.python.models.database_models import Base, Product, Return, Warranty
-from src.main.resources.config.database import DatabaseManager, DatabaseConfig
-from src.main.python.core.message_broker import MessageBroker
-from src.main.python.agents.data_fetch_agent import DataFetchAgent
-from src.main.python.models.message_types import AgentType, MessageType, DateRange
+import sys
+from pathlib import Path
+
+# Add the project root to Python path
+project_root = Path(__file__).parent.parent.parent
+src_path = project_root / "src" / "main" / "python"
+sys.path.insert(0, str(project_root))
+sys.path.insert(0, str(src_path))
+
+from models.database_models import Base, Product, Return, Warranty
+# Note: Using database config from resources
+import sys
+config_path = project_root / "src" / "main" / "resources" / "config"
+sys.path.insert(0, str(config_path))
+from database import DatabaseManager, DatabaseConfig
+from core.message_broker import MessageBroker
+from agents.data_fetch_agent import DataFetchAgent
+from models.message_types import AgentType, MessageType, DateRange
 
 
 @pytest.fixture(scope="session")
@@ -304,7 +317,7 @@ def assert_message_structure(message, expected_type: MessageType, expected_sende
 
 def create_test_message(message_type: MessageType, sender: AgentType, recipient: AgentType, payload: Dict[str, Any]):
     """Create a test message with proper structure."""
-    from src.main.python.models.message_types import create_message
+    from models.message_types import create_message
     return create_message(message_type, sender, recipient, payload)
 
 

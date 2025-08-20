@@ -73,6 +73,12 @@ mlruns/
 retail_data.db
 test_data.db
 
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
 # Temporary files
 tmp/
 temp/

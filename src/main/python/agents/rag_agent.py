@@ -17,6 +17,7 @@ from src.main.python.models.message_types import (
     BaseMessage, MessageType, AgentType, 
     CleanDataPayload, InsightData, InsightsPayload, create_message
 )
+from src.main.python.config.settings import settings
 
 
 @dataclass
@@ -251,7 +252,7 @@ class RAGAgent(BaseAgent):
             if not self.rag_config.enable_mock_mode:
                 try:
                     import openai
-                    api_key = os.getenv('OPENAI_API_KEY')
+                    api_key = settings.openai.api_key
                     if api_key:
                         self.openai_client = openai.OpenAI(api_key=api_key)
                         self.logger.info("OpenAI client initialized")
