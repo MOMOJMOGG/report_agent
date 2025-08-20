@@ -1,0 +1,77 @@
+# Core dependencies
+sqlalchemy>=2.0.0
+asyncio-compat>=0.1.0
+python-dateutil>=2.8.0
+
+# Database drivers
+# sqlite3 is included in Python standard library
+psycopg2-binary>=2.9.0  # PostgreSQL
+PyMySQL>=1.0.0  # MySQL
+
+# Data generation and manipulation
+faker>=19.0.0
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Vector store and RAG
+chromadb>=0.4.0
+sentence-transformers>=2.2.0
+openai>=1.0.0
+langchain>=0.1.0
+tiktoken>=0.5.0
+
+# Excel generation
+openpyxl>=3.1.0
+xlsxwriter>=3.1.0
+
+# Web framework and API
+fastapi>=0.100.0
+uvicorn>=0.22.0
+pydantic>=2.0.0
+python-multipart>=0.0.6
+
+# React dashboard dependencies (for backend API)
+jinja2>=3.1.0
+starlette>=0.27.0
+
+# Testing dependencies
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.0
+pytest-html>=3.2.0
+pytest-xdist>=3.3.0  # Parallel test execution
+coverage>=7.2.0
+factory-boy>=3.3.0  # Test data factories
+freezegun>=1.2.0  # Time mocking
+responses>=0.23.0  # HTTP mocking
+
+# Development and code quality
+black>=23.7.0
+flake8>=6.0.0
+mypy>=1.5.0
+isort>=5.12.0
+pre-commit>=3.3.0
+
+# Monitoring and logging
+structlog>=23.1.0
+prometheus-client>=0.17.0
+psutil>=5.9.0  # System monitoring
+
+# Configuration and environment
+python-dotenv>=1.0.0
+pyyaml>=6.0.0
+click>=8.1.0  # CLI interface
+
+# HTTP client for external APIs
+httpx>=0.24.0
+aiohttp>=3.8.0
+
+# Utilities
+tqdm>=4.65.0  # Progress bars
+python-json-logger>=2.0.0
+uuid>=1.30
+hashlib2>=1.0.0
+
+# Development servers
+watchdog>=3.0.0  # File watching for development
