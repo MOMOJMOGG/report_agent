@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 import json
 
-from src.main.python.models.message_types import BaseMessage, AgentType, MessageType
+from multi_agent.models.message_types import BaseMessage, AgentType, MessageType
 
 logger = logging.getLogger(__name__)
 

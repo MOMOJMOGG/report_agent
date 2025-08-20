@@ -268,7 +268,7 @@ class TestJobManagement:
             mock_pipeline.return_value = None
             
             # Simulate starting a job
-            from src.main.python.agents.dashboard_agent import AnalysisStatus
+            from multi_agent.agents.dashboard_agent import AnalysisStatus
             job_status = AnalysisStatus(
                 job_id=job_id,
                 status="pending",
@@ -284,7 +284,7 @@ class TestJobManagement:
             assert agent.active_jobs[job_id].status == "pending"
             
             # Simulate job completion
-            from src.main.python.agents.dashboard_agent import AnalysisResult, ReportInfo
+            from multi_agent.agents.dashboard_agent import AnalysisResult, ReportInfo
             result = AnalysisResult(
                 job_id=job_id,
                 status="completed",
@@ -304,7 +304,7 @@ class TestJobManagement:
     
     def test_job_status_updates(self, agent):
         """Test job status update functionality."""
-        from src.main.python.agents.dashboard_agent import AnalysisStatus
+        from multi_agent.agents.dashboard_agent import AnalysisStatus
         
         job_id = "test-job-456"
         job_status = AnalysisStatus(
@@ -498,7 +498,7 @@ class TestDashboardAgentStatistics:
         agent = DashboardAgent()
         
         # Add mock active job
-        from src.main.python.agents.dashboard_agent import AnalysisStatus
+        from multi_agent.agents.dashboard_agent import AnalysisStatus
         job_status = AnalysisStatus(
             job_id="test-job",
             status="running",
@@ -509,7 +509,7 @@ class TestDashboardAgentStatistics:
         agent.active_jobs["test-job"] = job_status
         
         # Add mock completed job
-        from src.main.python.agents.dashboard_agent import AnalysisResult
+        from multi_agent.agents.dashboard_agent import AnalysisResult
         result = AnalysisResult(
             job_id="completed-job",
             status="completed",

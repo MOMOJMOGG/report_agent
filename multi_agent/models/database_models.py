@@ -4,7 +4,7 @@ Database models for retail returns and warranty data.
 
 from sqlalchemy import Column, Integer, String, Date, Text, DECIMAL, ForeignKey
 from sqlalchemy.orm import relationship
-from src.main.resources.config.database import Base
+from multi_agent.config.database import Base
 from datetime import date
 from typing import Optional
 

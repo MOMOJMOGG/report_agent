@@ -12,7 +12,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 import traceback
 
-from src.main.python.models.message_types import (
+from multi_agent.models.message_types import (
     BaseMessage, MessageType, AgentType, TaskStatusPayload, create_message
 )
 

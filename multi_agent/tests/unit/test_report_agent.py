@@ -12,8 +12,8 @@ from unittest.mock import Mock, patch, AsyncMock
 from datetime import datetime
 from pathlib import Path
 
-from src.main.python.agents.report_agent import ReportAgent, ReportConfig
-from src.main.python.models.message_types import (
+from multi_agent.agents.report_agent import ReportAgent, ReportConfig
+from multi_agent.models.message_types import (
     MessageType, AgentType, InsightData, InsightsPayload, create_message
 )
 
@@ -52,7 +52,7 @@ class TestReportAgentInit:
         """Test agent startup when openpyxl is available."""
         agent = ReportAgent()
         
-        with patch('src.main.python.agents.report_agent.openpyxl') as mock_openpyxl:
+        with patch('multi_agent.agents.report_agent.openpyxl') as mock_openpyxl:
             await agent._on_start()
             assert agent.excel_available is True
         
@@ -63,7 +63,7 @@ class TestReportAgentInit:
         """Test agent startup when openpyxl is not available."""
         agent = ReportAgent()
         
-        with patch('src.main.python.agents.report_agent.openpyxl', side_effect=ImportError):
+        with patch('multi_agent.agents.report_agent.openpyxl', side_effect=ImportError):
             await agent._on_start()
             assert agent.excel_available is False
         

@@ -9,13 +9,13 @@ from typing import Dict, Any, List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, func
 
-from src.main.python.core.base_agent import BaseAgent, AgentConfig
-from src.main.python.models.message_types import (
+from multi_agent.core.base_agent import BaseAgent, AgentConfig
+from multi_agent.models.message_types import (
     BaseMessage, MessageType, AgentType, DateRange,
     FetchDataPayload, RawDataPayload, create_message
 )
-from src.main.python.models.database_models import Product, Return, Warranty, ProductDTO, ReturnDTO, WarrantyDTO
-from src.main.resources.config.database import db_manager
+from multi_agent.models.database_models import Product, Return, Warranty, ProductDTO, ReturnDTO, WarrantyDTO
+from multi_agent.config.database import db_manager
 
 
 class DataFetchAgent(BaseAgent):

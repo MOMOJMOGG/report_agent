@@ -7,9 +7,9 @@ import pytest
 import asyncio
 from datetime import date, timedelta
 
-from src.main.python.agents.data_fetch_agent import DataFetchAgent
-from src.main.python.core.message_broker import MessageBroker
-from src.main.python.models.message_types import (
+from multi_agent.agents.data_fetch_agent import DataFetchAgent
+from multi_agent.core.message_broker import MessageBroker
+from multi_agent.models.message_types import (
     MessageType, AgentType, DateRange, create_fetch_data_message
 )
 from src.test.conftest import wait_for_condition
@@ -47,7 +47,7 @@ class TestDataFetchAgentIntegration:
         agent = DataFetchAgent()
         
         # Mock database manager
-        import src.main.python.agents.data_fetch_agent as fetch_module
+        import multi_agent.agents.data_fetch_agent as fetch_module
         original_db_manager = fetch_module.db_manager
         fetch_module.db_manager = populated_test_db
         
@@ -139,7 +139,7 @@ class TestDataFetchAgentIntegration:
         fetch_agent = DataFetchAgent()
         
         # Mock database manager
-        import src.main.python.agents.data_fetch_agent as fetch_module
+        import multi_agent.agents.data_fetch_agent as fetch_module
         original_db_manager = fetch_module.db_manager
         fetch_module.db_manager = populated_test_db
         
@@ -240,7 +240,7 @@ class TestDataFetchAgentIntegration:
             broker.register_agent(AgentType.COORDINATOR, mock_coordinator)
             
             # Create invalid fetch request (invalid date range)
-            from src.main.python.models.message_types import create_message, MessageType
+            from multi_agent.models.message_types import create_message, MessageType
             
             invalid_message = create_message(
                 MessageType.FETCH_DATA,
@@ -290,7 +290,7 @@ class TestDataFetchAgentIntegration:
         fetch_agent = DataFetchAgent()
         
         # Mock database manager
-        import src.main.python.agents.data_fetch_agent as fetch_module
+        import multi_agent.agents.data_fetch_agent as fetch_module
         original_db_manager = fetch_module.db_manager
         fetch_module.db_manager = populated_test_db
         
@@ -377,7 +377,7 @@ class TestDataFetchAgentDatabaseIntegration:
         mock_db_manager = Mock()
         mock_db_manager.get_session.return_value = mock_session
         
-        with patch('src.main.python.agents.data_fetch_agent.db_manager', mock_db_manager):
+        with patch('multi_agent.agents.data_fetch_agent.db_manager', mock_db_manager):
             # First call should fail and retry
             with pytest.raises(Exception):
                 await agent._on_start()
@@ -387,7 +387,7 @@ class TestDataFetchAgentDatabaseIntegration:
         """Test that database transactions are properly rolled back on errors."""
         agent = DataFetchAgent()
         
-        from src.main.python.models.message_types import FetchDataPayload, DateRange
+        from multi_agent.models.message_types import FetchDataPayload, DateRange
         
         # Create payload that will cause an error
         payload = FetchDataPayload(
@@ -466,12 +466,12 @@ class TestDataFetchAgentPerformanceIntegration:
         agent = DataFetchAgent()
         
         # Mock database manager
-        import src.main.python.agents.data_fetch_agent as fetch_module
+        import multi_agent.agents.data_fetch_agent as fetch_module
         original_db_manager = fetch_module.db_manager
         fetch_module.db_manager = populated_test_db
         
         try:
-            from src.main.python.models.message_types import FetchDataPayload, DateRange
+            from multi_agent.models.message_types import FetchDataPayload, DateRange
             
             # Create identical payload for cache testing
             payload = FetchDataPayload(
@@ -533,7 +533,7 @@ class TestDataFetchAgentPerformanceIntegration:
             initial_memory = process.memory_info().rss
             
             # Fetch large dataset
-            from src.main.python.models.message_types import FetchDataPayload, DateRange
+            from multi_agent.models.message_types import FetchDataPayload, DateRange
             
             payload = FetchDataPayload(
                 date_range=DateRange(date.today() - timedelta(days=90), date.today()),
@@ -542,7 +542,7 @@ class TestDataFetchAgentPerformanceIntegration:
             )
             
             with test_db_manager as db_context:
-                fetch_module = __import__('src.main.python.agents.data_fetch_agent', fromlist=[''])
+                fetch_module = __import__('multi_agent.agents.data_fetch_agent', fromlist=[''])
                 original_db_manager = fetch_module.db_manager
                 fetch_module.db_manager = test_db_manager
                 

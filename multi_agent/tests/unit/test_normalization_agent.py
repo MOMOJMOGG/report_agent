@@ -9,10 +9,10 @@ import numpy as np
 from datetime import date, timedelta
 from unittest.mock import Mock, patch, AsyncMock
 
-from src.main.python.agents.normalization_agent import (
+from multi_agent.agents.normalization_agent import (
     NormalizationAgent, NormalizationRules, DataQualityMetrics
 )
-from src.main.python.models.message_types import (
+from multi_agent.models.message_types import (
     MessageType, AgentType, RawDataPayload, create_message
 )
 
@@ -670,7 +670,7 @@ class TestNormalizationIntegration:
         }
         
         # Create RawDataPayload
-        from src.main.python.models.message_types import RawDataPayload
+        from multi_agent.models.message_types import RawDataPayload
         payload = RawDataPayload(
             returns=raw_payload["returns"],
             warranties=raw_payload["warranties"],

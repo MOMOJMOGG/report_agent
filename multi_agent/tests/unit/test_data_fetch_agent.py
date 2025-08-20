@@ -8,11 +8,11 @@ import asyncio
 from datetime import date, timedelta
 from unittest.mock import Mock, patch, AsyncMock
 
-from src.main.python.agents.data_fetch_agent import DataFetchAgent
-from src.main.python.models.message_types import (
+from multi_agent.agents.data_fetch_agent import DataFetchAgent
+from multi_agent.models.message_types import (
     MessageType, AgentType, DateRange, create_fetch_data_message, BaseMessage
 )
-from src.main.python.models.database_models import Product, Return, Warranty
+from multi_agent.models.database_models import Product, Return, Warranty
 from src.test.conftest import (
     assert_message_structure, create_test_message, wait_for_condition,
     generate_test_returns, generate_test_warranties
@@ -34,7 +34,7 @@ class TestDataFetchAgentInit:
     
     def test_custom_config(self):
         """Test agent with custom configuration."""
-        from src.main.python.core.base_agent import AgentConfig
+        from multi_agent.core.base_agent import AgentConfig
         
         custom_config = AgentConfig(
             max_retries=3,
@@ -57,7 +57,7 @@ class TestDataFetchAgentDatabase:
         agent = DataFetchAgent()
         
         # Mock database manager to use test database
-        with patch('src.main.python.agents.data_fetch_agent.db_manager', populated_test_db):
+        with patch('multi_agent.agents.data_fetch_agent.db_manager', populated_test_db):
             # This should not raise an exception
             asyncio.run(agent._on_start())
     
@@ -144,7 +144,7 @@ class TestDataFetchAgentCaching:
         """Test cache key generation for queries."""
         agent = DataFetchAgent()
         
-        from src.main.python.models.message_types import FetchDataPayload, DateRange
+        from multi_agent.models.message_types import FetchDataPayload, DateRange
         
         payload1 = FetchDataPayload(
             date_range=DateRange(date(2024, 1, 1), date(2024, 3, 31)),
@@ -201,7 +201,7 @@ class TestDataFetchAgentMessageHandling:
         agent = DataFetchAgent()
         
         # Mock database manager
-        with patch('src.main.python.agents.data_fetch_agent.db_manager', populated_test_db):
+        with patch('multi_agent.agents.data_fetch_agent.db_manager', populated_test_db):
             # Create fetch data message
             date_range = DateRange(
                 start=date.today() - timedelta(days=30),
@@ -243,7 +243,7 @@ class TestDataFetchAgentMessageHandling:
         agent = DataFetchAgent()
         
         # Mock database manager to raise exception
-        with patch('src.main.python.agents.data_fetch_agent.db_manager') as mock_db:
+        with patch('multi_agent.agents.data_fetch_agent.db_manager') as mock_db:
             mock_db.get_session.side_effect = Exception("Database connection failed")
             
             # Create fetch data message
@@ -339,7 +339,7 @@ class TestDataFetchAgentDataQuality:
         """Test metadata generation for fetched data."""
         agent = DataFetchAgent()
         
-        from src.main.python.models.message_types import FetchDataPayload, DateRange
+        from multi_agent.models.message_types import FetchDataPayload, DateRange
         
         payload = FetchDataPayload(
             date_range=DateRange(date(2024, 1, 1), date(2024, 3, 31)),
@@ -450,7 +450,7 @@ class TestDataFetchAgentIntegration:
         """Test complete data fetch workflow."""
         agent = DataFetchAgent()
         
-        with patch('src.main.python.agents.data_fetch_agent.db_manager', populated_test_db):
+        with patch('multi_agent.agents.data_fetch_agent.db_manager', populated_test_db):
             await agent._on_start()
             
             # Create comprehensive fetch request
@@ -548,7 +548,7 @@ class TestDataFetchAgentPerformance:
         """Test that caching improves performance."""
         agent = DataFetchAgent()
         
-        from src.main.python.models.message_types import FetchDataPayload, DateRange
+        from multi_agent.models.message_types import FetchDataPayload, DateRange
         
         payload = FetchDataPayload(
             date_range=DateRange(date.today() - timedelta(days=30), date.today()),
@@ -556,7 +556,7 @@ class TestDataFetchAgentPerformance:
             filters={}
         )
         
-        with patch('src.main.python.agents.data_fetch_agent.db_manager', populated_test_db):
+        with patch('multi_agent.agents.data_fetch_agent.db_manager', populated_test_db):
             import time
             
             # First fetch (no cache)

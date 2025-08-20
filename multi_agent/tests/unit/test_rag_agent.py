@@ -9,10 +9,10 @@ import numpy as np
 from unittest.mock import Mock, patch, AsyncMock
 from datetime import datetime, timedelta
 
-from src.main.python.agents.rag_agent import (
+from multi_agent.agents.rag_agent import (
     RAGAgent, RAGConfig, SimpleEmbedding, SimpleVectorStore
 )
-from src.main.python.models.message_types import (
+from multi_agent.models.message_types import (
     MessageType, AgentType, CleanDataPayload, create_message
 )
 

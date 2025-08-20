@@ -9,8 +9,8 @@ from typing import List, Dict, Any
 from faker import Faker
 from sqlalchemy.orm import Session
 
-from src.main.python.models.database_models import Product, Return, Warranty
-from src.main.resources.config.database import db_manager
+from multi_agent.models.database_models import Product, Return, Warranty
+from multi_agent.config.database import db_manager
 
 fake = Faker()
 

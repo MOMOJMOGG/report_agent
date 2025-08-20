@@ -12,12 +12,12 @@ from typing import Dict, Any, List, Optional, Tuple
 import numpy as np
 from dataclasses import dataclass
 
-from src.main.python.core.base_agent import BaseAgent, AgentConfig
-from src.main.python.models.message_types import (
+from multi_agent.core.base_agent import BaseAgent, AgentConfig
+from multi_agent.models.message_types import (
     BaseMessage, MessageType, AgentType, 
     CleanDataPayload, InsightData, InsightsPayload, create_message
 )
-from src.main.python.config.settings import settings
+from multi_agent.config.settings import settings
 
 
 @dataclass

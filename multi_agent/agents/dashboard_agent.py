@@ -19,12 +19,12 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 import uvicorn
 
-from src.main.python.core.base_agent import BaseAgent, AgentConfig
-from src.main.python.models.message_types import (
+from multi_agent.core.base_agent import BaseAgent, AgentConfig
+from multi_agent.models.message_types import (
     BaseMessage, MessageType, AgentType, 
     ReportReadyPayload, ReportData, create_message
 )
-from src.main.python.config.settings import settings
+from multi_agent.config.settings import settings
 
 
 @dataclass

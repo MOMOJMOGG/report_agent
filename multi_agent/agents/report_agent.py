@@ -12,8 +12,8 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
-from src.main.python.core.base_agent import BaseAgent, AgentConfig
-from src.main.python.models.message_types import (
+from multi_agent.core.base_agent import BaseAgent, AgentConfig
+from multi_agent.models.message_types import (
     BaseMessage, MessageType, AgentType, 
     InsightsPayload, InsightData, ReportData, ReportReadyPayload, create_message
 )
