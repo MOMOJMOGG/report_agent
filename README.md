@@ -1,184 +1,174 @@
 # Multi-Agent RAG System 🤖
 
-**Advanced Retail Analytics with Multi-Agent Architecture & Dark Technology Dashboard**
+**Advanced Retail Analytics with Multi-Agent Architecture & Technology Dashboard**
 
-A sophisticated AI system that orchestrates multiple specialized agents to process retail returns & warranty data, generating comprehensive Excel reports and interactive web dashboards with real-time analytics and grounded insights.
+A sophisticated AI system that orchestrates multiple specialized agents to analyze retail returns and warranty data, generating comprehensive Excel reports and interactive web dashboards with real-time analytics and grounded insights.
+
+![Technology Stack](https://img.shields.io/badge/Backend-Python%20%7C%20FastAPI-blue)
+![Frontend](https://img.shields.io/badge/Frontend-React%20%7C%20TypeScript-cyan)
+![Database](https://img.shields.io/badge/Database-SQLite%20%7C%20SQLAlchemy-green)
+![AI](https://img.shields.io/badge/AI-OpenAI%20%7C%20RAG-orange)
 
 ## 🚀 Quick Start
 
-### Option 1: Complete System (Recommended)
+### One-Command Setup (Recommended)
 ```bash
-# Clone and setup
-git clone [repository-url]
-cd multi_agent
-
-# Create virtual environment
+# 1. Create virtual environment
 python -m venv agent
 source agent/bin/activate  # Linux/Mac
 # OR
 agent\Scripts\activate     # Windows
 
-# Install dependencies
-pip install -r requirements.txt
+# 2. Generate secure keys
+python generate_secrets.py
 
-# Start complete system (Backend + Frontend)
+# 3. Start complete system
 python start_system.py
 ```
 
-### Option 2: Backend Only
-```bash
-# Start FastAPI backend server
-python run_dashboard.py
+**Access Points:**
+- 🌐 **Dashboard**: http://localhost:3000 (React UI)
+- 🔧 **Backend API**: http://127.0.0.1:8000
+- 📋 **API Docs**: http://127.0.0.1:8000/docs
 
-# Access API at http://127.0.0.1:8000
-# API docs at http://127.0.0.1:8000/docs
-```
+## ✨ Key Features
 
-### Option 3: Development Mode
-```bash
-# Backend in one terminal
-python run_dashboard.py
-
-# Frontend in another terminal  
-cd frontend
-npm install
-npm run dev
-
-# Dashboard at http://localhost:3000
-```
-
-## Multi-Agent Architecture Overview
-
-This system implements a multi-agent RAG (Retrieval-Augmented Generation) pipeline:
-
-- **Data Fetch Agent**: Connects to retail database, extracts returns & warranty data
-- **Normalization Agent**: Cleans and structures raw data for analysis
-- **RAG Agent**: Generates grounded insights with citations from processed data
-- **Report Agent**: Creates Excel reports with formatted data and insights
-- **Dashboard Agent**: Builds web dashboards with interactive visualizations
-- **Coordinator Agent**: Orchestrates the entire pipeline and manages agent communication
-
-## AI/ML Project Structure
-
-**Complete MLOps-ready structure with data, models, experiments support**
-
-```
-report_multi_agent/
-├── src/main/python/        # Core application code
-│   ├── core/               # Multi-agent coordination logic
-│   ├── services/           # RAG pipeline services
-│   ├── models/             # Agent definitions & data models
-│   ├── api/                # Dashboard API endpoints
-│   ├── inference/          # Report generation
-│   └── utils/              # Data processing utilities
-├── data/                   # Dataset management
-│   ├── raw/                # Original retail data
-│   ├── processed/          # Cleaned returns/warranty data
-│   └── external/           # External data sources
-├── notebooks/              # Analysis & experimentation
-├── models/                 # ML models & artifacts
-├── experiments/            # RAG experiment tracking
-├── output/                 # Generated reports & dashboards
-└── docs/                   # Documentation
-```
-
-## Development Guidelines
-
-- **Always search first** before creating new files
-- **Extend existing** functionality rather than duplicating  
-- **Use Task agents** for operations >30 seconds
-- **Single source of truth** for all functionality
-- **Language-agnostic structure** - works with Python, JS, Java, etc.
-- **Scalable** - start simple, grow as needed
-- **MLOps-ready** - supports experiment tracking and model versioning
-
-## ✨ Features
-
-### 🤖 Multi-Agent RAG System
-- **6 Specialized Agents**: Data Fetch, Normalization, RAG, Report, Dashboard, Coordinator
+### 🤖 **Multi-Agent Architecture**
+- **6 Specialized Agents**: Data Fetch → Normalization → RAG → Report → Dashboard → Coordinator
+- **Async Message Passing**: Efficient inter-agent communication
 - **Pipeline Orchestration**: Automated workflow with stage tracking
-- **Message-Based Communication**: Async agent coordination
-- **Error Handling & Retry**: Robust failure recovery mechanisms
-- **Cost-Efficient**: Local embeddings + OpenAI integration (<$1 budget)
+- **Error Recovery**: Robust retry mechanisms and graceful failure handling
 
-### 🌙 Dark Technology Dashboard
-- **Modern UI**: Professional dark theme with cyan/blue technology accents
-- **Real-Time Monitoring**: Live job status and system health updates
-- **Interactive Analytics**: Charts with Recharts (bar, line, pie)
-- **Responsive Design**: Works on desktop, tablet, and mobile
-- **Glass Morphism**: Beautiful backdrop blur effects
+### 🌙 **Dark Technology Dashboard**
+- **Modern Dark Theme**: Professional UI with cyan/blue technology accents
+- **Real-Time Monitoring**: Live job status updates and progress tracking
+- **Interactive Charts**: Analytics with bar, line, and pie visualizations
+- **Responsive Design**: Optimized for desktop, tablet, and mobile
 
-### 📊 Advanced Analytics
+### 📊 **Advanced Analytics**
 - **Job Execution Trends**: Weekly performance visualization
-- **Agent Performance**: Individual agent success rates
-- **System Metrics**: Real-time resource monitoring
-- **24h Time Analysis**: Execution time patterns
+- **Agent Performance**: Individual success rates and load monitoring
+- **System Health**: Real-time resource and status monitoring
+- **24/7 Operations**: Continuous monitoring and alerting
 
-### 📈 Report Generation
-- **Excel Reports**: Multi-worksheet analysis with formatting
+### 📈 **Report Generation**
+- **Excel Reports**: Multi-worksheet analysis with professional formatting
 - **Executive Summaries**: High-level insights for stakeholders
-- **Data Quality Reports**: Validation and cleanliness metrics
-- **Download Management**: Organized report library
+- **Data Quality Reports**: Validation metrics and cleanliness scores
+- **Download Management**: Organized report library with metadata
 
-### ⚙️ Configuration Management
-- **Environment Settings**: Database, RAG, Report, Dashboard configs
-- **Real-Time Updates**: Settings applied without restart
-- **Security**: Secure secret key management
-- **Monitoring**: System health and performance tracking
+## 🏗️ Project Structure
 
-## 🏗️ Architecture
+```
+multi_agent/
+├── README.md                    # This file
+├── CLAUDE.md                   # Development guidelines
+├── start_system.py             # One-command startup script
+├── generate_secrets.py         # Security key generator
+├── run_dashboard.py            # Backend server runner
+├── requirements.txt            # Python dependencies
+│
+├── multi_agent/                # Main Python package
+│   ├── agents/                 # Specialized AI agents
+│   │   ├── coordinator_agent.py    # Pipeline orchestrator
+│   │   ├── data_fetch_agent.py     # Database connector
+│   │   ├── normalization_agent.py  # Data cleaner
+│   │   ├── rag_agent.py            # RAG processor
+│   │   ├── report_agent.py         # Excel generator
+│   │   └── dashboard_agent.py      # API server
+│   ├── core/                   # Core framework
+│   │   ├── base_agent.py           # Agent base class
+│   │   └── message_broker.py       # Message passing
+│   ├── models/                 # Data models
+│   │   ├── database_models.py      # SQLAlchemy models
+│   │   └── message_types.py        # Agent messages
+│   ├── config/                 # Configuration
+│   │   ├── settings.py             # App settings
+│   │   └── database.py             # DB config
+│   ├── utils/                  # Utilities
+│   │   └── seed_data_generator.py  # Sample data
+│   └── tests/                  # Comprehensive tests
+│       ├── unit/                   # Unit tests
+│       ├── integration/            # Integration tests
+│       └── conftest.py             # Test configuration
+│
+├── frontend/                   # React dashboard
+│   ├── src/
+│   │   ├── components/         # UI components
+│   │   ├── pages/              # Dashboard pages
+│   │   ├── hooks/              # React hooks
+│   │   ├── utils/              # Utilities
+│   │   └── types/              # TypeScript types
+│   ├── package.json            # Node dependencies
+│   └── README.md               # Frontend docs
+│
+├── data/                       # Data storage
+│   └── retail_data.db          # SQLite database
+├── output/                     # Generated files
+│   └── reports/                # Excel reports
+├── logs/                       # Application logs
+└── docs/                       # Documentation
+    ├── SECRET_KEYS_GUIDE.md    # Security setup
+    └── development-plan.md     # Development history
+```
 
-### Technology Stack
-**Backend:**
-- Python 3.10+ with FastAPI
-- SQLAlchemy ORM with SQLite
-- OpenAI API integration
-- Pytest testing framework
+## 🔧 Technology Stack
 
-**Frontend:**
-- React 18 + TypeScript
-- Vite for fast development
-- Tailwind CSS for styling
-- Recharts for visualizations
+**Backend (Python):**
+- **FastAPI**: Modern, fast web framework with automatic API docs
+- **SQLAlchemy**: Powerful ORM with SQLite database
+- **OpenAI API**: GPT integration for RAG processing
+- **Pytest**: Comprehensive testing framework
+
+**Frontend (React):**
+- **React 18**: Modern React with hooks and TypeScript
+- **Vite**: Lightning-fast development and building
+- **Tailwind CSS**: Utility-first styling with dark theme
+- **Recharts**: Interactive data visualizations
 
 **Infrastructure:**
-- Message-driven architecture
-- Async/await throughout
-- RESTful API design
-- Git-based deployment
+- **Async Architecture**: Full async/await for performance
+- **RESTful API**: Clean API design with proper HTTP methods
+- **Message Passing**: Event-driven agent communication
+- **Environment Config**: Secure configuration management
 
 ## 📋 System Requirements
 
-**Python Backend:**
-- Python 3.10 or higher
-- 2GB RAM minimum
-- SQLite database support
-- OpenAI API key (optional for full RAG)
-
-**React Frontend:**
+**Development:**
+- Python 3.10+
 - Node.js 16+ and npm
+- 4GB RAM minimum
 - Modern web browser
-- 1GB disk space for dependencies
 
-## 🔧 Configuration
+**Production:**
+- 8GB RAM recommended
+- PostgreSQL (optional upgrade from SQLite)
+- Reverse proxy (Nginx recommended)
+- SSL certificate for HTTPS
+
+## ⚙️ Configuration
 
 ### Environment Variables (.env)
 ```bash
-# OpenAI Configuration
+# Security (Generated by generate_secrets.py)
+SECRET_KEY=your_generated_secret_key
+JWT_SECRET_KEY=your_generated_jwt_secret_key
+
+# OpenAI (Optional - can use mock mode)
 OPENAI_API_KEY=your_openai_api_key_here
 OPENAI_MODEL=gpt-3.5-turbo
 OPENAI_MAX_TOKENS=150
 
-# RAG Configuration  
+# Database
+DATABASE_URL=sqlite:///data/retail_data.db
+DATABASE_ECHO=false
+
+# RAG Configuration
 RAG_ENABLE_MOCK_MODE=false
 RAG_MAX_API_CALLS_PER_SESSION=10
 RAG_SIMILARITY_THRESHOLD=0.2
 
-# Database Configuration
-DATABASE_URL=sqlite:///data/retail_data.db
-DATABASE_ECHO=false
-
-# Dashboard Configuration
+# Dashboard
 DASHBOARD_HOST=127.0.0.1
 DASHBOARD_PORT=8000
 DASHBOARD_DEBUG=false
@@ -188,24 +178,29 @@ DASHBOARD_DEBUG=false
 
 ```bash
 # Run all tests
-pytest src/test/ -v
+pytest multi_agent/tests/ -v
 
-# Run specific agent tests
-pytest src/test/unit/test_coordinator_agent.py -v
-pytest src/test/unit/test_dashboard_agent.py -v
-pytest src/test/unit/test_rag_agent.py -v
+# Run specific test categories
+pytest multi_agent/tests/unit/ -v
+pytest multi_agent/tests/integration/ -v
 
-# Integration tests
-pytest src/test/integration/ -v
+# Run with coverage
+pytest multi_agent/tests/ --cov=multi_agent --cov-report=html
 ```
 
 ## 📊 Usage Examples
 
-### Start Analysis Job via API
+### Start Analysis via Dashboard
+1. Open http://localhost:3000
+2. Click "Quick Analysis" button
+3. Monitor real-time progress
+4. Download Excel reports when complete
+
+### API Usage (Python)
 ```python
 import requests
 
-# Start new analysis
+# Start analysis job
 response = requests.post('http://127.0.0.1:8000/api/v1/analysis/start', json={
     "date_range_start": "2024-01-01",
     "date_range_end": "2024-03-31",
@@ -214,67 +209,110 @@ response = requests.post('http://127.0.0.1:8000/api/v1/analysis/start', json={
 })
 
 job_id = response.json()["job_id"]
-print(f"Started job: {job_id}")
-```
 
-### Monitor Job Progress
-```python
-# Check job status
+# Monitor progress
 status_response = requests.get(f'http://127.0.0.1:8000/api/v1/analysis/{job_id}/status')
-status = status_response.json()
-print(f"Status: {status['status']}, Progress: {status['progress']*100:.1f}%")
+print(f"Status: {status_response.json()['status']}")
 ```
 
 ## 🚀 Deployment
 
-### Production Setup
-1. **Environment**: Use production-grade database (PostgreSQL)
-2. **Security**: Set strong secret keys and JWT tokens
-3. **Scaling**: Deploy with Gunicorn/Uvicorn workers
-4. **Frontend**: Build with `npm run build` and serve with Nginx
-5. **Monitoring**: Enable logging and health checks
+### Development
+```bash
+# Frontend development mode
+cd frontend && npm run dev
 
-### Docker Deployment (Optional)
+# Backend development mode  
+python run_dashboard.py
+```
+
+### Production
+```bash
+# Build frontend
+cd frontend && npm run build
+
+# Start with production settings
+export DASHBOARD_DEBUG=false
+python start_system.py
+```
+
+### Docker (Optional)
 ```dockerfile
-# Create Dockerfile for containerized deployment
 FROM python:3.10-slim
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY . /app
 WORKDIR /app
+EXPOSE 8000
 CMD ["python", "run_dashboard.py"]
 ```
+
+## 🛠️ Troubleshooting
+
+### Common Issues
+
+**"No virtual environment detected"**
+```bash
+python -m venv agent
+source agent/bin/activate  # Linux/Mac
+agent\Scripts\activate     # Windows
+```
+
+**"SECRET_KEY not found"**
+```bash
+python generate_secrets.py
+# Choose option 1 to create .env file
+```
+
+**"Port 8000 in use"**
+```bash
+# Change port in .env file
+DASHBOARD_PORT=8080
+```
+
+**"OpenAI API errors"**
+```bash
+# Enable mock mode for testing
+RAG_ENABLE_MOCK_MODE=true
+```
+
+### Debug Mode
+```bash
+# Enable detailed logging
+export LOG_LEVEL=DEBUG
+python start_system.py
+```
+
+## 🔒 Security
+
+- **Secure Key Generation**: Cryptographically secure random keys
+- **Environment Variables**: Sensitive data in .env (never committed)
+- **Input Validation**: All API inputs validated and sanitized
+- **CORS Protection**: Configured origins for web security
+- **Rate Limiting**: API rate limiting for production use
+
+## 📈 Performance
+
+- **Async Architecture**: Non-blocking operations throughout
+- **Database Optimization**: Efficient queries with SQLAlchemy
+- **Caching Strategy**: Smart caching for RAG operations
+- **Resource Monitoring**: Built-in performance metrics
+- **Horizontal Scaling**: Agent-based architecture scales well
 
 ## 🤝 Contributing
 
 1. **Read CLAUDE.md** - Essential development guidelines
-2. **Follow Architecture** - Use existing patterns and structure
-3. **Test Everything** - Comprehensive test coverage required
-4. **Commit Often** - Atomic commits with descriptive messages
-5. **Document Changes** - Update README and code comments
+2. **Follow Structure** - Use established patterns and imports
+3. **Test Coverage** - Write tests for all new features
+4. **Commit Style** - Use descriptive commit messages
+5. **Documentation** - Update README and inline docs
 
-## 📖 Documentation
+## 🆘 Support
 
-- **CLAUDE.md** - Development guidelines and critical rules
-- **frontend/README.md** - React dashboard documentation
-- **API Documentation** - Available at `/docs` when running backend
-- **Agent Documentation** - Inline docstrings in agent classes
-
-## 🛠️ Troubleshooting
-
-**Common Issues:**
-- **Port 8000 in use**: Change `DASHBOARD_PORT` in settings
-- **OpenAI API errors**: Check API key and enable mock mode for testing
-- **Database locked**: Ensure no other processes are using SQLite file
-- **Frontend won't start**: Run `npm install` in frontend directory
-- **Import errors**: Activate virtual environment and install requirements
-
-**Debug Mode:**
-```bash
-# Enable debug logging
-export LOG_LEVEL=DEBUG
-python run_dashboard.py
-```
+- **Documentation**: Check `docs/` directory
+- **API Reference**: Visit `/docs` endpoint when running
+- **Environment Check**: Run `python check_venv.py`
+- **Key Generation**: Run `python generate_secrets.py`
 
 ## 📄 License
 
@@ -282,5 +320,7 @@ MIT License - Feel free to use and modify for your projects.
 
 ---
 
-🎯 **Multi-Agent RAG System v1.0.0**  
-🤖 **Generated with Claude Code** | 💻 **Technology Agent Style Dashboard**
+**🤖 Multi-Agent RAG System v1.0.0**  
+*Professional retail analytics with AI-powered insights and modern dashboard*
+
+Built with ❤️ using Claude Code | Technology Agent Aesthetic 🌙

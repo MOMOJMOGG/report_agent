@@ -9,11 +9,11 @@ import sys
 import signal
 from pathlib import Path
 
-# Add src to path
-sys.path.append('src/main/python')
+# Add project root to path for imports
+sys.path.insert(0, str(Path(__file__).parent))
 
-from agents.dashboard_agent import DashboardAgent, DashboardConfig
-from config.settings import settings
+from multi_agent.agents.dashboard_agent import DashboardAgent, DashboardConfig
+from multi_agent.config.settings import settings
 
 
 async def main():

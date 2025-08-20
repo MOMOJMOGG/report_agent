@@ -86,7 +86,7 @@ def main():
     db_path = project_root / "data" / "retail_data.db"
     if not db_path.exists():
         print("Creating database and seeding with sample data...")
-        run_command(f"{activate_cmd}python src/main/python/utils/seed_data_generator.py", cwd=project_root)
+        run_command(f"{activate_cmd}python -m multi_agent.utils.seed_data_generator", cwd=project_root)
     
     print("\n🔧 Starting FastAPI Backend Server...")
     backend_process = run_command(
