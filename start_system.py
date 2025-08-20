@@ -10,6 +10,20 @@ import subprocess
 import time
 from pathlib import Path
 
+def is_in_venv():
+    """Check if we're currently running in a virtual environment."""
+    return (
+        hasattr(sys, 'real_prefix') or  # virtualenv
+        (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix) or  # venv
+        'VIRTUAL_ENV' in os.environ  # both
+    )
+
+def get_venv_name():
+    """Get the name of the current virtual environment."""
+    if 'VIRTUAL_ENV' in os.environ:
+        return os.path.basename(os.environ['VIRTUAL_ENV'])
+    return None
+
 def run_command(cmd, cwd=None, background=False):
     """Run a command with optional working directory."""
     print(f"Running: {cmd}")
@@ -25,18 +39,45 @@ def main():
     # Get project root
     project_root = Path(__file__).parent
     
-    # Check if virtual environment exists
-    venv_path = project_root / "agent"
-    if not venv_path.exists():
-        print("❌ Virtual environment 'agent' not found!")
-        print("Please create it first: python -m venv agent")
-        sys.exit(1)
-    
-    # Activate virtual environment command based on OS
-    if os.name == 'nt':  # Windows
-        activate_cmd = f"{venv_path}/Scripts/activate && "
-    else:  # Unix/Linux/Mac
-        activate_cmd = f"source {venv_path}/bin/activate && "
+    # Check virtual environment status
+    if is_in_venv():
+        venv_name = get_venv_name()
+        print(f"✅ Virtual environment detected: {venv_name or 'active'}")
+        
+        # Check if we're in the expected 'agent' venv
+        if venv_name and venv_name != 'agent':
+            print(f"⚠️  Warning: You're in '{venv_name}' venv, but 'agent' is recommended")
+            response = input("Continue anyway? (y/n): ")
+            if response.lower() != 'y':
+                print("Please activate the 'agent' virtual environment and try again")
+                sys.exit(1)
+        
+        # No activation needed - we're already in venv
+        activate_cmd = ""
+    else:
+        print("❌ No virtual environment detected!")
+        
+        # Check if 'agent' venv exists
+        venv_path = project_root / "agent"
+        if not venv_path.exists():
+            print("Virtual environment 'agent' not found!")
+            print("Please create and activate it first:")
+            print("  python -m venv agent")
+            if os.name == 'nt':
+                print("  agent\\Scripts\\activate")
+            else:
+                print("  source agent/bin/activate")
+            print("  python start_system.py")
+            sys.exit(1)
+        else:
+            print("Virtual environment 'agent' exists but not activated!")
+            print("Please activate it first:")
+            if os.name == 'nt':
+                print("  agent\\Scripts\\activate")
+            else:
+                print("  source agent/bin/activate")
+            print("  python start_system.py")
+            sys.exit(1)
     
     print("📦 Installing/updating Python dependencies...")
     run_command(f"{activate_cmd}pip install -r requirements.txt", cwd=project_root)
