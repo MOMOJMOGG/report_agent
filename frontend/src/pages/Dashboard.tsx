@@ -9,6 +9,7 @@ import AgentActivityFeed, { AgentMessage } from '@/components/demo/AgentActivity
 import PipelineVisualizer, { PipelineStage } from '@/components/demo/PipelineVisualizer';
 import AgentStatusPanel, { AgentStatus } from '@/components/demo/AgentStatusPanel';
 import AnalysisWizard from '@/components/demo/AnalysisWizard';
+import SystemSettingsModal from '@/components/demo/SystemSettingsModal';
 import { useJobs, useReports } from '@/hooks/useApi';
 import { apiService } from '@/utils/api';
 import { AnalysisRequest } from '@/types';
@@ -19,6 +20,7 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [isStartingJob, setIsStartingJob] = useState(false);
   const [showAnalysisWizard, setShowAnalysisWizard] = useState(false);
+  const [showSystemSettings, setShowSystemSettings] = useState(false);
   
   // Demo data states
   const [agentMessages, setAgentMessages] = useState<AgentMessage[]>([]);
@@ -261,9 +263,19 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleAnalysisStart = (jobId: string) => {
+  const handleAnalysisStart = async (jobId: string) => {
     toast.success(`Analysis started with job ID: ${jobId.slice(0, 8)}`);
-    // You could start real pipeline simulation here
+    
+    // Start the pipeline simulation for wizard-triggered analyses
+    try {
+      setIsStartingJob(true);
+      await simulatePipelineDemo();
+    } catch (error) {
+      toast.error('Pipeline simulation failed');
+      console.error('Error in pipeline simulation:', error);
+    } finally {
+      setIsStartingJob(false);
+    }
   };
 
   const handleCustomAnalysis = () => {
@@ -275,8 +287,7 @@ const Dashboard: React.FC = () => {
   };
 
   const handleSystemSettings = () => {
-    // Could navigate to settings or show modal
-    toast.info('System settings coming soon!');
+    setShowSystemSettings(true);
   };
 
   return (
@@ -486,6 +497,12 @@ const Dashboard: React.FC = () => {
         isOpen={showAnalysisWizard}
         onClose={() => setShowAnalysisWizard(false)}
         onAnalysisStart={handleAnalysisStart}
+      />
+
+      {/* System Settings Modal */}
+      <SystemSettingsModal
+        isOpen={showSystemSettings}
+        onClose={() => setShowSystemSettings(false)}
       />
     </div>
   );

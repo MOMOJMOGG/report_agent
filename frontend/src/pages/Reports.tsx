@@ -1,27 +1,187 @@
-import React from 'react';
-import { Download, FileText, Calendar, HardDrive } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Download, FileText, Calendar, HardDrive, RefreshCw, Trash2, Eye, Filter } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { useReports } from '@/hooks/useApi';
 import { formatTimestamp, formatBytes } from '@/utils/formatters';
 
+interface SampleReport {
+  id: string;
+  file_path: string;
+  report_type: string;
+  created_at: string;
+  size_bytes: number;
+  worksheets: string[];
+  job_id: string;
+  status: string;
+}
+
 const Reports: React.FC = () => {
   const { reports, loading } = useReports();
+  const [sampleReports, setSampleReports] = useState<SampleReport[]>([]);
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [refreshing, setRefreshing] = useState(false);
 
-  const handleDownload = (filename: string) => {
-    // Create download link
-    const link = document.createElement('a');
-    link.href = `/api/v1/reports/${filename}/download`;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  // Create sample reports for demonstration
+  useEffect(() => {
+    const samples: SampleReport[] = [
+      {
+        id: 'rpt_001',
+        file_path: 'output/reports/retail_analysis_2024-01-20_14-30-15.xlsx',
+        report_type: 'excel_comprehensive',
+        created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        size_bytes: 145420,
+        worksheets: ['Executive Summary', 'Returns Analysis', 'Warranty Claims', 'Product Performance'],
+        job_id: 'job_abc123',
+        status: 'completed'
+      },
+      {
+        id: 'rpt_002',
+        file_path: 'output/reports/warranty_deep_dive_2024-01-20_13-15-30.xlsx',
+        report_type: 'excel_warranty',
+        created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+        size_bytes: 89320,
+        worksheets: ['Warranty Overview', 'Resolution Times', 'Cost Analysis'],
+        job_id: 'job_def456',
+        status: 'completed'
+      },
+      {
+        id: 'rpt_003',
+        file_path: 'output/reports/returns_pattern_analysis_2024-01-19_16-45-22.xlsx',
+        report_type: 'excel_returns',
+        created_at: new Date(Date.now() - 22 * 60 * 60 * 1000).toISOString(),
+        size_bytes: 203150,
+        worksheets: ['Return Trends', 'Category Analysis', 'Seasonal Patterns', 'Store Comparison'],
+        job_id: 'job_ghi789',
+        status: 'completed'
+      },
+      {
+        id: 'rpt_004',
+        file_path: 'output/reports/quick_demo_analysis_2024-01-20_15-22-18.csv',
+        report_type: 'csv_summary',
+        created_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+        size_bytes: 12480,
+        worksheets: ['Summary Data'],
+        job_id: 'job_jkl012',
+        status: 'completed'
+      },
+      {
+        id: 'rpt_005',
+        file_path: 'output/reports/electronics_focus_2024-01-20_12-08-45.xlsx',
+        report_type: 'excel_category',
+        created_at: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
+        size_bytes: 167890,
+        worksheets: ['Electronics Overview', 'Return Reasons', 'Warranty Issues'],
+        job_id: 'job_mno345',
+        status: 'completed'
+      }
+    ];
+    setSampleReports(samples);
+  }, []);
+
+  const allReports = [...reports, ...sampleReports];
+  const filteredReports = allReports.filter(report => {
+    if (typeFilter === 'all') return true;
+    return report.report_type.includes(typeFilter);
+  });
+
+  const handleDownload = (report: SampleReport) => {
+    try {
+      // Create download link
+      const filename = report.file_path.split('/').pop() || 'report.xlsx';
+      const link = document.createElement('a');
+      link.href = `/api/v1/reports/${filename}/download`;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success(`Downloading ${filename}`);
+    } catch (error) {
+      toast.error('Failed to download report');
+    }
+  };
+
+  const handlePreview = (report: SampleReport) => {
+    toast.info(`Preview functionality for ${report.report_type} reports coming soon!`);
+  };
+
+  const handleDeleteReport = async (reportId: string) => {
+    const confirmed = window.confirm('Are you sure you want to delete this report?');
+    if (!confirmed) return;
+
+    try {
+      // For sample reports, just remove from state
+      setSampleReports(prev => prev.filter(r => r.id !== reportId));
+      toast.success('Report deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete report');
+    }
+  };
+
+  const handleRefreshReports = async () => {
+    setRefreshing(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success('Reports refreshed');
+    } catch (error) {
+      toast.error('Failed to refresh reports');
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  const getReportTypeColor = (type: string) => {
+    if (type.includes('excel')) {
+      if (type.includes('comprehensive')) return 'bg-primary-500/20 text-primary-400';
+      if (type.includes('warranty')) return 'bg-warning-500/20 text-warning-400';
+      if (type.includes('returns')) return 'bg-success-500/20 text-success-400';
+      if (type.includes('category')) return 'bg-accent-500/20 text-accent-400';
+    }
+    return 'bg-dark-500/20 text-dark-400';
+  };
+
+  const getReportTypeName = (type: string) => {
+    const typeMap: Record<string, string> = {
+      'excel_comprehensive': 'Comprehensive Analysis',
+      'excel_warranty': 'Warranty Focus',
+      'excel_returns': 'Returns Analysis',
+      'excel_category': 'Category Focus',
+      'csv_summary': 'CSV Summary'
+    };
+    return typeMap[type] || type;
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-dark-800">Reports</h2>
-        <p className="text-dark-500 mt-1">Download and manage your analysis reports</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-dark-800">Analysis Reports</h2>
+          <p className="text-dark-500 mt-1">Download and manage your analysis reports</p>
+        </div>
+        <div className="flex items-center space-x-3">
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="input-field text-sm"
+          >
+            <option value="all">All Types</option>
+            <option value="excel">Excel Reports</option>
+            <option value="csv">CSV Reports</option>
+            <option value="comprehensive">Comprehensive</option>
+            <option value="warranty">Warranty Focus</option>
+            <option value="returns">Returns Analysis</option>
+          </select>
+          <button
+            onClick={handleRefreshReports}
+            disabled={refreshing}
+            className="btn-secondary flex items-center space-x-2 disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <span>Refresh</span>
+          </button>
+        </div>
       </div>
 
       {/* Summary Stats */}
@@ -30,8 +190,8 @@ const Reports: React.FC = () => {
           <div className="w-12 h-12 bg-primary-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
             <FileText className="w-6 h-6 text-primary-400" />
           </div>
-          <p className="text-2xl font-bold text-dark-800">{reports.length}</p>
-          <p className="text-sm text-dark-500">Total Reports</p>
+          <p className="text-2xl font-bold text-dark-800">{filteredReports.length}</p>
+          <p className="text-sm text-dark-500">Available Reports</p>
         </div>
 
         <div className="card-tech text-center">
@@ -39,7 +199,7 @@ const Reports: React.FC = () => {
             <Calendar className="w-6 h-6 text-success-400" />
           </div>
           <p className="text-2xl font-bold text-dark-800">
-            {reports.filter(r => {
+            {filteredReports.filter(r => {
               const reportDate = new Date(r.created_at);
               const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
               return reportDate > weekAgo;
@@ -53,7 +213,7 @@ const Reports: React.FC = () => {
             <HardDrive className="w-6 h-6 text-warning-400" />
           </div>
           <p className="text-2xl font-bold text-dark-800">
-            {formatBytes(reports.reduce((total, report) => total + report.size_bytes, 0))}
+            {formatBytes(filteredReports.reduce((total, report) => total + report.size_bytes, 0))}
           </p>
           <p className="text-sm text-dark-500">Total Size</p>
         </div>
@@ -63,35 +223,61 @@ const Reports: React.FC = () => {
       <div className="card-tech">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-dark-800">Available Reports</h3>
-          <span className="text-sm text-dark-500">{reports.length} reports</span>
+          <span className="text-sm text-dark-500">{filteredReports.length} reports</span>
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
           </div>
-        ) : reports.length > 0 ? (
+        ) : filteredReports.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {reports.map((report, index) => (
-              <div key={index} className="bg-dark-200/30 border border-dark-300/30 rounded-lg p-4 hover:border-primary-500/30 transition-all duration-300 group">
+            {filteredReports.map((report, index) => (
+              <div key={report.id} className="bg-dark-200/30 border border-dark-300/30 rounded-lg p-4 hover:border-primary-500/30 transition-all duration-300 group">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                       <FileText className="w-5 h-5 text-primary-400" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <h4 className="font-medium text-dark-700 text-sm">
                         {report.file_path.split('/').pop()?.replace(/\.[^/.]+$/, "")}
                       </h4>
-                      <p className="text-xs text-dark-500">{report.report_type}</p>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getReportTypeColor(report.report_type)}`}>
+                          {getReportTypeName(report.report_type)}
+                        </span>
+                        {(report as any).job_id && (
+                          <span className="text-xs text-dark-500 font-tech">
+                            {(report as any).job_id.slice(0, 8)}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <button 
-                    onClick={() => handleDownload(report.file_path.split('/').pop() || '')}
-                    className="p-2 text-primary-400 hover:bg-primary-500/20 rounded-lg transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center space-x-1">
+                    <button 
+                      onClick={() => handlePreview(report as SampleReport)}
+                      className="p-1.5 text-dark-400 hover:bg-dark-500/20 rounded-lg transition-colors"
+                      title="Preview report"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                    </button>
+                    <button 
+                      onClick={() => handleDownload(report as SampleReport)}
+                      className="p-1.5 text-primary-400 hover:bg-primary-500/20 rounded-lg transition-colors"
+                      title="Download report"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteReport(report.id)}
+                      className="p-1.5 text-accent-400 hover:bg-accent-500/20 rounded-lg transition-colors"
+                      title="Delete report"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-2 text-xs text-dark-500">
