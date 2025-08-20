@@ -87,11 +87,12 @@ class BaseAgent(ABC):
         self.message_queue: asyncio.Queue = asyncio.Queue()
         self.executor = ThreadPoolExecutor(max_workers=self.config.max_concurrent_tasks)
         
+        # Setup logging first
+        self.logger = logging.getLogger(f"{self.__class__.__name__}")
+        
         # Register default message handlers
         self._register_default_handlers()
         
-        # Setup logging
-        self.logger = logging.getLogger(f"{self.__class__.__name__}")
         self.logger.info(f"Initialized {self.name}")
     
     def _register_default_handlers(self):

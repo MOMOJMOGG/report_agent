@@ -5,7 +5,7 @@ Database configuration and connection management for Multi-Agent RAG system.
 import os
 from typing import Optional
 from sqlalchemy import create_engine, Engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import QueuePool
 
