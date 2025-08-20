@@ -85,7 +85,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
             key={item.name}
             to={item.href}
             className={({ isActive }) =>
-              `nav-item ${isActive ? 'active' : ''}`
+              `nav-item group ${isActive ? 'active' : ''}`
             }
             onClick={onClose}
           >
