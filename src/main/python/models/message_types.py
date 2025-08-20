@@ -187,6 +187,38 @@ class InsightsPayload:
         }
 
 @dataclass
+class ReportData:
+    """Individual report file with metadata."""
+    file_path: str
+    report_type: str
+    created_at: datetime
+    size_bytes: int
+    worksheets: List[str]
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "file_path": self.file_path,
+            "report_type": self.report_type,
+            "created_at": self.created_at.isoformat(),
+            "size_bytes": self.size_bytes,
+            "worksheets": self.worksheets
+        }
+
+@dataclass
+class ReportReadyPayload:
+    """Payload for REPORT_READY message."""
+    reports: List[ReportData]
+    generation_metadata: Dict[str, Any]
+    summary_stats: Dict[str, Any]
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "reports": [report.to_dict() for report in self.reports],
+            "generation_metadata": self.generation_metadata,
+            "summary_stats": self.summary_stats
+        }
+
+@dataclass
 class TaskStatusPayload:
     """Payload for task status messages."""
     task_id: str

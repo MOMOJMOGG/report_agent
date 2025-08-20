@@ -66,6 +66,13 @@ mlruns/
 .ipynb_checkpoints/
 */.ipynb_checkpoints/*
 
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+retail_data.db
+test_data.db
+
 # Temporary files
 tmp/
 temp/
