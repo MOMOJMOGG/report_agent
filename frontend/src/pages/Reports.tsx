@@ -159,7 +159,7 @@ const ReportsContent: React.FC = () => {
   const allReports = [...reports, ...sampleReports];
   const filteredReports = allReports.filter(report => {
     if (typeFilter === 'all') return true;
-    return report.report_type.includes(typeFilter);
+    return report.report_type && report.report_type.includes(typeFilter);
   });
 
   const handleDownload = (report: SampleReport) => {
@@ -225,9 +225,10 @@ const ReportsContent: React.FC = () => {
       'excel_warranty': 'Warranty Focus',
       'excel_returns': 'Returns Analysis',
       'excel_category': 'Category Focus',
-      'csv_summary': 'CSV Summary'
+      'csv_summary': 'CSV Summary',
+      'unknown': 'Unknown Type'
     };
-    return typeMap[type] || type;
+    return typeMap[type] || type || 'Unknown Type';
   };
 
   // Show loading state until component is properly initialized
@@ -303,6 +304,7 @@ const ReportsContent: React.FC = () => {
           </div>
           <p className="text-2xl font-bold text-dark-800">
             {filteredReports.filter(r => {
+              if (!r.created_at) return false;
               const reportDate = new Date(r.created_at);
               const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
               return reportDate > weekAgo;
@@ -316,7 +318,7 @@ const ReportsContent: React.FC = () => {
             <HardDrive className="w-6 h-6 text-warning-400" />
           </div>
           <p className="text-2xl font-bold text-dark-800">
-            {formatBytes(filteredReports.reduce((total, report) => total + report.size_bytes, 0))}
+            {formatBytes(filteredReports.reduce((total, report) => total + (report.size_bytes || 0), 0))}
           </p>
           <p className="text-sm text-dark-500">Total Size</p>
         </div>
@@ -351,7 +353,7 @@ const ReportsContent: React.FC = () => {
         ) : filteredReports.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredReports.map((report, index) => (
-              <div key={report.id} className="bg-dark-200/30 border border-dark-300/30 rounded-lg p-4 hover:border-primary-500/30 transition-all duration-300 group">
+              <div key={(report as any).id || `report-${index}`} className="bg-dark-200/30 border border-dark-300/30 rounded-lg p-4 hover:border-primary-500/30 transition-all duration-300 group">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -359,11 +361,11 @@ const ReportsContent: React.FC = () => {
                     </div>
                     <div className="flex-1">
                       <h4 className="font-medium text-dark-700 text-sm">
-                        {report.file_path.split('/').pop()?.replace(/\.[^/.]+$/, "")}
+                        {report.file_path ? report.file_path.split('/').pop()?.replace(/\.[^/.]+$/, "") : 'Unknown Report'}
                       </h4>
                       <div className="flex items-center space-x-2 mt-1">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getReportTypeColor(report.report_type)}`}>
-                          {getReportTypeName(report.report_type)}
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getReportTypeColor(report.report_type || '')}`}>
+                          {getReportTypeName(report.report_type || 'unknown')}
                         </span>
                         {(report as any).job_id && (
                           <span className="text-xs text-dark-500 font-tech">
@@ -389,7 +391,7 @@ const ReportsContent: React.FC = () => {
                       <Download className="w-3.5 h-3.5" />
                     </button>
                     <button 
-                      onClick={() => handleDeleteReport(report.id)}
+                      onClick={() => handleDeleteReport((report as any).id || `report-${index}`)}
                       className="p-1.5 text-accent-400 hover:bg-accent-500/20 rounded-lg transition-colors"
                       title="Delete report"
                     >
@@ -401,11 +403,11 @@ const ReportsContent: React.FC = () => {
                 <div className="space-y-2 text-xs text-dark-500">
                   <div className="flex justify-between">
                     <span>Created</span>
-                    <span className="font-tech">{formatTimestamp(report.created_at)}</span>
+                    <span className="font-tech">{report.created_at ? formatTimestamp(report.created_at) : 'Unknown'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Size</span>
-                    <span className="font-tech">{formatBytes(report.size_bytes)}</span>
+                    <span className="font-tech">{formatBytes(report.size_bytes || 0)}</span>
                   </div>
                   {report.worksheets && (
                     <div className="flex justify-between">
