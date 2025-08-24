@@ -252,12 +252,26 @@ const Dashboard: React.FC = () => {
     try {
       setIsStartingJob(true);
       
-      // Start demo simulation
+      // Create a real backend job for live demo
+      const demoConfig = {
+        date_range_start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days ago
+        date_range_end: new Date().toISOString().split('T')[0], // today
+        tables: ["returns", "warranties", "products"],
+        filters: {
+          demo_mode: true,
+          scenario: "live_demo"
+        }
+      };
+      
+      const result = await apiService.startAnalysis(demoConfig);
+      toast.success(`Live demo started - Job ID: ${result.job_id.slice(0, 8)}`);
+      
+      // Start frontend simulation to show the pipeline visualization
       await simulatePipelineDemo();
       
     } catch (error) {
-      toast.error('Failed to start analysis');
-      console.error('Error starting analysis:', error);
+      toast.error('Failed to start live demo analysis');
+      console.error('Error starting live demo analysis:', error);
     } finally {
       setIsStartingJob(false);
     }

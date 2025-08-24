@@ -149,18 +149,10 @@ class ExcelReportGenerator:
         for i, insight in enumerate(insights, start=12):
             ws[f'A{i}'] = f"• {insight}"
         
-        # Auto-adjust column widths
-        for column in ws.columns:
-            max_length = 0
-            column_letter = column[0].column_letter
-            for cell in column:
-                try:
-                    if len(str(cell.value)) > max_length:
-                        max_length = len(str(cell.value))
-                except:
-                    pass
-            adjusted_width = min(max_length + 2, 50)
-            ws.column_dimensions[column_letter].width = adjusted_width
+        # Set basic column widths to avoid MergedCell issues
+        for col_num in range(1, 5):  # A through D
+            column_letter = chr(64 + col_num)  # A=65, B=66, etc.
+            ws.column_dimensions[column_letter].width = 30
     
     def _create_returns_analysis_sheet(self, wb: Workbook):
         """Create returns analysis worksheet with sample data."""
@@ -195,18 +187,12 @@ class ExcelReportGenerator:
             for c, value in enumerate(row, 1):
                 ws.cell(row=r, column=c, value=value)
         
-        # Auto-adjust columns
-        for column in ws.columns:
-            max_length = 0
-            column_letter = column[0].column_letter
-            for cell in column:
-                try:
-                    if len(str(cell.value)) > max_length:
-                        max_length = len(str(cell.value))
-                except:
-                    pass
-            adjusted_width = min(max_length + 2, 30)
-            ws.column_dimensions[column_letter].width = adjusted_width
+        # Set column widths
+        column_widths = [15, 12, 15, 12, 12, 10, 15]  # Adjust based on expected content
+        for i, width in enumerate(column_widths, start=1):
+            if i <= ws.max_column:
+                column_letter = chr(64 + i)
+                ws.column_dimensions[column_letter].width = width
     
     def _create_warranty_claims_sheet(self, wb: Workbook):
         """Create warranty claims worksheet."""
@@ -241,18 +227,11 @@ class ExcelReportGenerator:
             for c, value in enumerate(row, 1):
                 ws.cell(row=r, column=c, value=value)
         
-        # Auto-adjust columns
-        for column in ws.columns:
-            max_length = 0
-            column_letter = column[0].column_letter
-            for cell in column:
-                try:
-                    if len(str(cell.value)) > max_length:
-                        max_length = len(str(cell.value))
-                except:
-                    pass
-            adjusted_width = min(max_length + 2, 25)
-            ws.column_dimensions[column_letter].width = adjusted_width
+        # Set column widths safely
+        for i in range(1, 8):  # Up to column G
+            if i <= ws.max_column:
+                column_letter = chr(64 + i)
+                ws.column_dimensions[column_letter].width = 15
     
     def _create_product_performance_sheet(self, wb: Workbook):
         """Create product performance worksheet."""
@@ -290,18 +269,11 @@ class ExcelReportGenerator:
             for c, value in enumerate(row, 1):
                 ws.cell(row=r, column=c, value=value)
         
-        # Auto-adjust columns
-        for column in ws.columns:
-            max_length = 0
-            column_letter = column[0].column_letter
-            for cell in column:
-                try:
-                    if len(str(cell.value)) > max_length:
-                        max_length = len(str(cell.value))
-                except:
-                    pass
-            adjusted_width = min(max_length + 2, 25)
-            ws.column_dimensions[column_letter].width = adjusted_width
+        # Set column widths safely
+        for i in range(1, 8):  # Up to column G
+            if i <= ws.max_column:
+                column_letter = chr(64 + i)
+                ws.column_dimensions[column_letter].width = 15
     
     def _create_warranty_overview_sheet(self, wb: Workbook):
         """Create warranty overview sheet."""

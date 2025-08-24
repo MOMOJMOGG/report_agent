@@ -1,8 +1,56 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ErrorBoundary } from 'react';
 import { Download, FileText, Calendar, HardDrive, RefreshCw, Trash2, Eye, Filter, AlertTriangle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useReports } from '@/hooks/useApi';
 import { formatTimestamp, formatBytes } from '@/utils/formatters';
+
+// Error Boundary Component
+class ReportsErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Reports component error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="space-y-6">
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-8 h-8 text-red-400" />
+            </div>
+            <h2 className="text-xl font-bold text-dark-800 mb-2">Reports Page Error</h2>
+            <p className="text-dark-500 mb-4">Something went wrong loading the reports page</p>
+            <div className="bg-dark-200/30 p-4 rounded-lg mb-4 text-left max-w-md mx-auto">
+              <pre className="text-xs text-red-400 overflow-auto">
+                {this.state.error?.toString()}
+              </pre>
+            </div>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="btn-primary"
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 interface SampleReport {
   id: string;
@@ -15,16 +63,28 @@ interface SampleReport {
   status: string;
 }
 
-const Reports: React.FC = () => {
+const ReportsContent: React.FC = () => {
   const { reports, loading, error } = useReports();
   const [sampleReports, setSampleReports] = useState<SampleReport[]>([]);
   const [typeFilter, setTypeFilter] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
   const [debugInfo, setDebugInfo] = useState<string>('');
+  const [componentLoaded, setComponentLoaded] = useState(false);
+
+  // Component initialization
+  useEffect(() => {
+    console.log('Reports component mounting...');
+    setComponentLoaded(true);
+    return () => {
+      console.log('Reports component unmounting...');
+    };
+  }, []);
 
   // Create sample reports for demonstration
   useEffect(() => {
-    const samples: SampleReport[] = [
+    try {
+      console.log('Setting up sample reports...');
+      const samples: SampleReport[] = [
       {
         id: 'rpt_001',
         file_path: 'output/reports/retail_analysis_2024-01-20_14-30-15.xlsx',
@@ -75,8 +135,13 @@ const Reports: React.FC = () => {
         job_id: 'job_mno345',
         status: 'completed'
       }
-    ];
-    setSampleReports(samples);
+      ];
+      setSampleReports(samples);
+      console.log('Sample reports set successfully:', samples.length);
+    } catch (error) {
+      console.error('Error setting up sample reports:', error);
+      toast.error('Failed to initialize sample reports');
+    }
   }, []);
 
   // Debug info effect
@@ -164,6 +229,18 @@ const Reports: React.FC = () => {
     };
     return typeMap[type] || type;
   };
+
+  // Show loading state until component is properly initialized
+  if (!componentLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
+          <p className="text-dark-500">Loading Reports...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -365,6 +442,15 @@ const Reports: React.FC = () => {
         )}
       </div>
     </div>
+  );
+};
+
+// Main Reports component with error boundary
+const Reports: React.FC = () => {
+  return (
+    <ReportsErrorBoundary>
+      <ReportsContent />
+    </ReportsErrorBoundary>
   );
 };
 

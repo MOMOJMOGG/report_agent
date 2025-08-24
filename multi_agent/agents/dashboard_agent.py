@@ -148,25 +148,56 @@ class DashboardAgent(BaseAgent):
     
     def _setup_logging(self):
         """Setup comprehensive logging for the dashboard agent."""
-        # Configure root logger
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.StreamHandler(sys.stdout),
-                logging.FileHandler('logs/dashboard_agent.log')
-            ]
+        # Ensure logs directory exists first
+        logs_dir = Path('logs')
+        logs_dir.mkdir(exist_ok=True)
+        
+        # Clear any existing handlers to avoid conflicts
+        root_logger = logging.getLogger()
+        root_logger.handlers.clear()
+        
+        # Create formatters
+        detailed_formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s'
+        )
+        simple_formatter = logging.Formatter(
+            '%(asctime)s - %(levelname)s - %(message)s'
         )
         
-        # Ensure logs directory exists
-        Path('logs').mkdir(exist_ok=True)
+        # Setup file handler
+        log_file = logs_dir / 'dashboard_agent.log'
+        file_handler = logging.FileHandler(str(log_file), mode='a')
+        file_handler.setLevel(logging.DEBUG)
+        file_handler.setFormatter(detailed_formatter)
+        
+        # Setup console handler  
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setLevel(logging.INFO)
+        console_handler.setFormatter(simple_formatter)
+        
+        # Configure root logger
+        root_logger.setLevel(logging.DEBUG)
+        root_logger.addHandler(file_handler)
+        root_logger.addHandler(console_handler)
         
         # Create specific loggers
         self.access_logger = logging.getLogger("dashboard.access")
         self.error_logger = logging.getLogger("dashboard.error")
         self.api_logger = logging.getLogger("dashboard.api")
         
-        self.logger.info("Dashboard agent logging initialized")
+        # Set specific levels
+        self.access_logger.setLevel(logging.INFO)
+        self.error_logger.setLevel(logging.WARNING)
+        self.api_logger.setLevel(logging.DEBUG)
+        
+        # Log startup message
+        self.logger.info("Dashboard agent logging system initialized")
+        self.logger.info(f"Log file: {log_file.absolute()}")
+        
+        # Test all loggers
+        self.access_logger.info("Access logger initialized")
+        self.error_logger.warning("Error logger initialized")  
+        self.api_logger.debug("API logger initialized")
     
     def _setup_error_handlers(self):
         """Setup comprehensive error handlers for FastAPI."""
