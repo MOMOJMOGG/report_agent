@@ -354,50 +354,57 @@ const ReportsContent: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredReports.map((report, index) => (
               <div key={(report as any).id || `report-${index}`} className="bg-dark-200/30 border border-dark-300/30 rounded-lg p-4 hover:border-primary-500/30 transition-all duration-300 group">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <FileText className="w-5 h-5 text-primary-400" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-dark-700 text-sm">
-                        {report.file_path ? report.file_path.split('/').pop()?.replace(/\.[^/.]+$/, "") : 'Unknown Report'}
-                      </h4>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getReportTypeColor(report.report_type || '')}`}>
-                          {getReportTypeName(report.report_type || 'unknown')}
+                {/* Header with icon and title */}
+                <div className="flex items-start space-x-3 mb-3">
+                  <div className="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
+                    <FileText className="w-5 h-5 text-primary-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-dark-700 text-sm break-words leading-relaxed" 
+                        style={{ 
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden'
+                        }}>
+                      {report.file_path ? report.file_path.split('/').pop()?.replace(/\.[^/.]+$/, "") : 'Unknown Report'}
+                    </h4>
+                    <div className="flex items-center space-x-2 mt-1 flex-wrap">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getReportTypeColor(report.report_type || '')}`}>
+                        {getReportTypeName(report.report_type || 'unknown')}
+                      </span>
+                      {(report as any).job_id && (
+                        <span className="text-xs text-dark-500 font-tech">
+                          {(report as any).job_id.slice(0, 8)}
                         </span>
-                        {(report as any).job_id && (
-                          <span className="text-xs text-dark-500 font-tech">
-                            {(report as any).job_id.slice(0, 8)}
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <button 
-                      onClick={() => handlePreview(report as SampleReport)}
-                      className="p-1.5 text-dark-400 hover:bg-dark-500/20 rounded-lg transition-colors"
-                      title="Preview report"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                    </button>
-                    <button 
-                      onClick={() => handleDownload(report as SampleReport)}
-                      className="p-1.5 text-primary-400 hover:bg-primary-500/20 rounded-lg transition-colors"
-                      title="Download report"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteReport((report as any).id || `report-${index}`)}
-                      className="p-1.5 text-accent-400 hover:bg-accent-500/20 rounded-lg transition-colors"
-                      title="Delete report"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+                </div>
+                
+                {/* Action buttons */}
+                <div className="flex items-center justify-end space-x-1 mb-3">
+                  <button 
+                    onClick={() => handlePreview(report as SampleReport)}
+                    className="p-1.5 text-dark-400 hover:bg-dark-500/20 rounded-lg transition-colors"
+                    title="Preview report"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                  </button>
+                  <button 
+                    onClick={() => handleDownload(report as SampleReport)}
+                    className="p-1.5 text-primary-400 hover:bg-primary-500/20 rounded-lg transition-colors"
+                    title="Download report"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                  </button>
+                  <button 
+                    onClick={() => handleDeleteReport((report as any).id || `report-${index}`)}
+                    className="p-1.5 text-accent-400 hover:bg-accent-500/20 rounded-lg transition-colors"
+                    title="Delete report"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
 
                 <div className="space-y-2 text-xs text-dark-500">
