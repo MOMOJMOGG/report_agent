@@ -31,10 +31,10 @@ const AgentActivityFeed: React.FC<AgentActivityFeedProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive (container only)
   useEffect(() => {
-    if (autoScroll && messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (autoScroll && containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
   }, [messages, autoScroll]);
 
@@ -233,7 +233,9 @@ const AgentActivityFeed: React.FC<AgentActivityFeedProps> = ({
           <button
             onClick={() => {
               setAutoScroll(true);
-              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+              if (containerRef.current) {
+                containerRef.current.scrollTop = containerRef.current.scrollHeight;
+              }
             }}
             className="text-primary-400 hover:text-primary-300 transition-colors"
           >

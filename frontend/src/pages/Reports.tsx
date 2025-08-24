@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Download, FileText, Calendar, HardDrive, RefreshCw, Trash2, Eye, Filter } from 'lucide-react';
+import { Download, FileText, Calendar, HardDrive, RefreshCw, Trash2, Eye, Filter, AlertTriangle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useReports } from '@/hooks/useApi';
 import { formatTimestamp, formatBytes } from '@/utils/formatters';
@@ -16,10 +16,11 @@ interface SampleReport {
 }
 
 const Reports: React.FC = () => {
-  const { reports, loading } = useReports();
+  const { reports, loading, error } = useReports();
   const [sampleReports, setSampleReports] = useState<SampleReport[]>([]);
   const [typeFilter, setTypeFilter] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
   // Create sample reports for demonstration
   useEffect(() => {
@@ -77,6 +78,18 @@ const Reports: React.FC = () => {
     ];
     setSampleReports(samples);
   }, []);
+
+  // Debug info effect
+  useEffect(() => {
+    const debugData = {
+      apiReports: reports.length,
+      sampleReports: sampleReports.length,
+      loading,
+      error,
+      totalFiltered: 0
+    };
+    setDebugInfo(JSON.stringify(debugData, null, 2));
+  }, [reports, sampleReports, loading, error]);
 
   const allReports = [...reports, ...sampleReports];
   const filteredReports = allReports.filter(report => {
@@ -159,6 +172,19 @@ const Reports: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-dark-800">Analysis Reports</h2>
           <p className="text-dark-500 mt-1">Download and manage your analysis reports</p>
+          {error && (
+            <div className="mt-2 p-2 bg-red-500/10 border border-red-500/20 rounded text-red-400 text-sm">
+              API Error: {error}
+            </div>
+          )}
+          {process.env.NODE_ENV === 'development' && (
+            <details className="mt-2">
+              <summary className="text-xs text-dark-500 cursor-pointer">Debug Info</summary>
+              <pre className="mt-1 p-2 bg-dark-300/20 rounded text-xs font-mono text-dark-600">
+                {debugInfo}
+              </pre>
+            </details>
+          )}
         </div>
         <div className="flex items-center space-x-3">
           <select
@@ -229,6 +255,21 @@ const Reports: React.FC = () => {
         {loading ? (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+            <span className="ml-2 text-dark-500">Loading reports...</span>
+          </div>
+        ) : error ? (
+          <div className="text-center py-8">
+            <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <AlertTriangle className="w-6 h-6 text-red-400" />
+            </div>
+            <p className="text-red-400 mb-2">Failed to load reports</p>
+            <p className="text-sm text-dark-500 mb-4">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="btn-secondary"
+            >
+              Retry
+            </button>
           </div>
         ) : filteredReports.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

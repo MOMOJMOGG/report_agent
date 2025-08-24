@@ -12,12 +12,16 @@ from dataclasses import dataclass
 from pathlib import Path
 import uuid
 
-from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks, Depends, status
+from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks, Depends, status, Request
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 import uvicorn
+import logging
+import traceback
+from datetime import datetime
+import sys
 
 from multi_agent.core.base_agent import BaseAgent, AgentConfig
 from multi_agent.models.message_types import (
@@ -109,12 +113,18 @@ class DashboardAgent(BaseAgent):
         # Register message handlers
         self.register_handler(MessageType.REPORT_READY, self.handle_report_ready)
         
+        # Setup logging
+        self._setup_logging()
+        
         # Initialize FastAPI app
         self.app = FastAPI(
             title="Retail Analysis Dashboard API",
             description="REST API for multi-agent retail data analysis system",
             version="1.0.0"
         )
+        
+        # Setup error handlers
+        self._setup_error_handlers()
         
         # Configure CORS
         self.app.add_middleware(
@@ -135,6 +145,106 @@ class DashboardAgent(BaseAgent):
         # Ensure directories exist
         Path(self.dashboard_config.static_files_path).mkdir(parents=True, exist_ok=True)
         Path(settings.report.output_directory).mkdir(parents=True, exist_ok=True)
+    
+    def _setup_logging(self):
+        """Setup comprehensive logging for the dashboard agent."""
+        # Configure root logger
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.StreamHandler(sys.stdout),
+                logging.FileHandler('logs/dashboard_agent.log')
+            ]
+        )
+        
+        # Ensure logs directory exists
+        Path('logs').mkdir(exist_ok=True)
+        
+        # Create specific loggers
+        self.access_logger = logging.getLogger("dashboard.access")
+        self.error_logger = logging.getLogger("dashboard.error")
+        self.api_logger = logging.getLogger("dashboard.api")
+        
+        self.logger.info("Dashboard agent logging initialized")
+    
+    def _setup_error_handlers(self):
+        """Setup comprehensive error handlers for FastAPI."""
+        
+        @self.app.middleware("http")
+        async def log_requests(request: Request, call_next):
+            start_time = datetime.now()
+            
+            # Log request
+            self.access_logger.info(
+                f"Request: {request.method} {request.url} - "
+                f"Client: {request.client.host if request.client else 'unknown'}"
+            )
+            
+            try:
+                response = await call_next(request)
+                duration = (datetime.now() - start_time).total_seconds()
+                
+                # Log response
+                self.access_logger.info(
+                    f"Response: {response.status_code} - "
+                    f"Duration: {duration:.3f}s"
+                )
+                
+                return response
+                
+            except Exception as e:
+                duration = (datetime.now() - start_time).total_seconds()
+                self.error_logger.error(
+                    f"Request failed: {request.method} {request.url} - "
+                    f"Duration: {duration:.3f}s - Error: {str(e)}\n"
+                    f"Traceback: {traceback.format_exc()}"
+                )
+                
+                return JSONResponse(
+                    status_code=500,
+                    content={
+                        "error": "Internal server error",
+                        "message": "An unexpected error occurred",
+                        "timestamp": datetime.now().isoformat(),
+                        "request_id": str(uuid.uuid4())
+                    }
+                )
+        
+        @self.app.exception_handler(HTTPException)
+        async def http_exception_handler(request: Request, exc: HTTPException):
+            self.error_logger.warning(
+                f"HTTP Exception: {exc.status_code} - {exc.detail} - "
+                f"Request: {request.method} {request.url}"
+            )
+            
+            return JSONResponse(
+                status_code=exc.status_code,
+                content={
+                    "error": exc.detail,
+                    "status_code": exc.status_code,
+                    "timestamp": datetime.now().isoformat(),
+                    "path": str(request.url)
+                }
+            )
+        
+        @self.app.exception_handler(Exception)
+        async def general_exception_handler(request: Request, exc: Exception):
+            self.error_logger.error(
+                f"Unhandled Exception: {type(exc).__name__}: {str(exc)} - "
+                f"Request: {request.method} {request.url}\n"
+                f"Traceback: {traceback.format_exc()}"
+            )
+            
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "error": "Internal server error",
+                    "message": "An unexpected error occurred. Please try again later.",
+                    "timestamp": datetime.now().isoformat(),
+                    "request_id": str(uuid.uuid4())
+                }
+            )
     
     async def _on_start(self):
         """Initialize dashboard agent."""
@@ -176,12 +286,38 @@ class DashboardAgent(BaseAgent):
         @self.app.get("/health")
         async def health_check():
             """Health check endpoint."""
-            return {
-                "status": "healthy",
-                "timestamp": datetime.now().isoformat(),
-                "active_jobs": len(self.active_jobs),
-                "completed_jobs": len(self.completed_jobs)
-            }
+            try:
+                self.api_logger.debug("Health check requested")
+                
+                # Check system health
+                reports_dir = Path(settings.report.output_directory)
+                reports_dir_exists = reports_dir.exists()
+                available_reports = len(list(reports_dir.glob("*"))) if reports_dir_exists else 0
+                
+                health_data = {
+                    "status": "healthy",
+                    "timestamp": datetime.now().isoformat(),
+                    "active_jobs": len(self.active_jobs),
+                    "completed_jobs": len(self.completed_jobs),
+                    "system_info": {
+                        "reports_directory_exists": reports_dir_exists,
+                        "available_reports": available_reports,
+                        "reports_directory": str(reports_dir)
+                    }
+                }
+                
+                self.api_logger.debug(f"Health check completed: {health_data}")
+                return health_data
+                
+            except Exception as e:
+                self.error_logger.error(f"Health check failed: {e}\n{traceback.format_exc()}")
+                return {
+                    "status": "unhealthy",
+                    "timestamp": datetime.now().isoformat(),
+                    "error": str(e),
+                    "active_jobs": len(getattr(self, 'active_jobs', {})),
+                    "completed_jobs": len(getattr(self, 'completed_jobs', {}))
+                }
         
         @self.app.post("/api/v1/analysis/start", response_model=Dict[str, str])
         async def start_analysis(request: AnalysisRequest, background_tasks: BackgroundTasks):
@@ -264,36 +400,86 @@ class DashboardAgent(BaseAgent):
         @self.app.get("/api/v1/reports")
         async def list_reports():
             """List all available reports."""
-            reports = []
-            reports_dir = Path(settings.report.output_directory)
-            
-            if reports_dir.exists():
-                for report_file in reports_dir.glob("*"):
+            try:
+                self.api_logger.info("Listing reports from directory")
+                reports = []
+                reports_dir = Path(settings.report.output_directory)
+                
+                if not reports_dir.exists():
+                    self.api_logger.warning(f"Reports directory does not exist: {reports_dir}")
+                    reports_dir.mkdir(parents=True, exist_ok=True)
+                    self.api_logger.info(f"Created reports directory: {reports_dir}")
+                
+                report_files = list(reports_dir.glob("*"))
+                self.api_logger.info(f"Found {len(report_files)} files in reports directory")
+                
+                for report_file in report_files:
                     if report_file.is_file():
-                        stat = report_file.stat()
-                        reports.append({
-                            "file_path": str(report_file),
-                            "file_name": report_file.name,
-                            "size_bytes": stat.st_size,
-                            "created_at": datetime.fromtimestamp(stat.st_ctime).isoformat(),
-                            "download_url": f"/api/v1/reports/{report_file.name}/download"
-                        })
-            
-            return {"reports": reports}
+                        try:
+                            stat = report_file.stat()
+                            report_info = {
+                                "file_path": str(report_file),
+                                "file_name": report_file.name,
+                                "size_bytes": stat.st_size,
+                                "created_at": datetime.fromtimestamp(stat.st_ctime).isoformat(),
+                                "download_url": f"/api/v1/reports/{report_file.name}/download"
+                            }
+                            reports.append(report_info)
+                            self.api_logger.debug(f"Added report: {report_file.name} ({stat.st_size} bytes)")
+                        except Exception as e:
+                            self.error_logger.warning(f"Error processing report file {report_file}: {e}")
+                
+                self.api_logger.info(f"Successfully listed {len(reports)} reports")
+                return {"reports": reports}
+                
+            except Exception as e:
+                self.error_logger.error(f"Error listing reports: {e}\n{traceback.format_exc()}")
+                raise HTTPException(
+                    status_code=500, 
+                    detail=f"Failed to list reports: {str(e)}"
+                )
         
         @self.app.get("/api/v1/reports/{report_name}/download")
         async def download_report(report_name: str):
             """Download a specific report file."""
-            report_path = Path(settings.report.output_directory) / report_name
-            
-            if not report_path.exists():
-                raise HTTPException(status_code=404, detail="Report not found")
-            
-            return FileResponse(
-                path=str(report_path),
-                filename=report_name,
-                media_type='application/octet-stream'
-            )
+            try:
+                self.api_logger.info(f"Download requested for report: {report_name}")
+                
+                # Validate filename (security check)
+                if '..' in report_name or '/' in report_name or '\\' in report_name:
+                    self.error_logger.warning(f"Invalid report filename attempted: {report_name}")
+                    raise HTTPException(status_code=400, detail="Invalid filename")
+                
+                report_path = Path(settings.report.output_directory) / report_name
+                
+                if not report_path.exists():
+                    self.error_logger.warning(f"Report not found: {report_path}")
+                    available_files = list(Path(settings.report.output_directory).glob("*"))
+                    self.api_logger.info(f"Available files: {[f.name for f in available_files if f.is_file()]}")
+                    raise HTTPException(status_code=404, detail="Report not found")
+                
+                # Check if it's actually a file
+                if not report_path.is_file():
+                    self.error_logger.warning(f"Path exists but is not a file: {report_path}")
+                    raise HTTPException(status_code=404, detail="Report not found")
+                
+                file_size = report_path.stat().st_size
+                self.api_logger.info(f"Serving report: {report_name} ({file_size} bytes)")
+                
+                return FileResponse(
+                    path=str(report_path),
+                    filename=report_name,
+                    media_type='application/octet-stream'
+                )
+                
+            except HTTPException:
+                raise
+            except Exception as e:
+                self.error_logger.error(f"Error downloading report {report_name}: {e}\n{traceback.format_exc()}")
+                raise HTTPException(
+                    status_code=500, 
+                    detail=f"Failed to download report: {str(e)}"
+                )
         
         @self.app.post("/api/v1/data/upload")
         async def upload_data_file(file: UploadFile = File(...)):
