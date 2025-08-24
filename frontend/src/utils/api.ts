@@ -40,7 +40,7 @@ api.interceptors.response.use(
 export const apiService = {
   // Health check
   health: async (): Promise<HealthStatus> => {
-    const response = await api.get('/health');
+    const response = await axios.get('/health');
     return response.data;
   },
 

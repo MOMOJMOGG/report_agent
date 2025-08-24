@@ -61,15 +61,49 @@ const Jobs: React.FC = () => {
     try {
       setProcessingActions(prev => new Set(prev).add(jobId));
       
-      // Simulate report download
-      const link = document.createElement('a');
-      link.href = `/api/v1/jobs/${jobId}/report/download`;
-      link.download = `retail_analysis_${jobId.slice(0, 8)}.xlsx`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      toast.success(`Report for job ${jobId.slice(0, 8)} downloaded`);
+      // Get job results first to find the report filename
+      try {
+        const response = await fetch(`/api/v1/analysis/${jobId}/results`);
+        if (response.ok) {
+          const results = await response.json();
+          if (results.reports && results.reports.length > 0) {
+            const report = results.reports[0];
+            const filename = report.file_path.split('/').pop();
+            
+            // Download the actual report file
+            const link = document.createElement('a');
+            link.href = `/api/v1/reports/${filename}/download`;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            toast.success(`Report for job ${jobId.slice(0, 8)} downloaded`);
+          } else {
+            toast.error('No reports found for this job');
+          }
+        } else {
+          // Fallback to generic download if job results not found
+          const link = document.createElement('a');
+          link.href = `/api/v1/reports/retail_analysis_${jobId.slice(0, 8)}.xlsx/download`;
+          link.download = `retail_analysis_${jobId.slice(0, 8)}.xlsx`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          toast.success(`Report download initiated for job ${jobId.slice(0, 8)}`);
+        }
+      } catch (fetchError) {
+        // Fallback download attempt
+        const link = document.createElement('a');
+        link.href = `/api/v1/reports/retail_analysis_${jobId.slice(0, 8)}.xlsx/download`;
+        link.download = `retail_analysis_${jobId.slice(0, 8)}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        toast.success(`Report download initiated for job ${jobId.slice(0, 8)}`);
+      }
     } catch (error) {
       toast.error('Failed to download report');
     } finally {

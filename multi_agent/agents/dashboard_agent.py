@@ -25,6 +25,7 @@ from multi_agent.models.message_types import (
     ReportReadyPayload, ReportData, create_message
 )
 from multi_agent.config.settings import settings
+from multi_agent.utils.report_generator import ExcelReportGenerator
 
 
 @dataclass
@@ -101,6 +102,9 @@ class DashboardAgent(BaseAgent):
         
         # Dashboard configuration
         self.dashboard_config = dashboard_config or DashboardConfig()
+        
+        # Initialize report generator
+        self.report_generator = ExcelReportGenerator(settings.report.output_directory)
         
         # Register message handlers
         self.register_handler(MessageType.REPORT_READY, self.handle_report_ready)
@@ -342,15 +346,17 @@ class DashboardAgent(BaseAgent):
             self.active_jobs[job_id].progress = 0.8
             await asyncio.sleep(2)  # Simulate report generation
             
-            # Mock completed result
+            # Generate actual Excel report
+            report_info = self.report_generator.generate_comprehensive_report(job_id)
+            
             mock_reports = [
                 ReportInfo(
-                    file_path=f"output/reports/analysis_{job_id}.xlsx",
-                    report_type="excel_analysis",
-                    created_at=datetime.now(),
-                    size_bytes=9224,
-                    worksheets=["Executive Summary", "AI Insights", "Returns Analysis"],
-                    download_url=f"/api/v1/reports/analysis_{job_id}.xlsx/download"
+                    file_path=report_info["file_path"],
+                    report_type=report_info["report_type"],
+                    created_at=datetime.fromisoformat(report_info["created_at"]),
+                    size_bytes=report_info["size_bytes"],
+                    worksheets=report_info["worksheets"],
+                    download_url=f"/api/v1/reports/{report_info['filename']}/download"
                 )
             ]
             
